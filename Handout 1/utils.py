@@ -1,63 +1,49 @@
+from pathlib import Path
 import json
-from os import path
 
-def extract_route(requisicao):
-    if requisicao.startswith('GET'):
-        lista1 = requisicao.split("GET /")
+def extract_route(request):
+    return request.split()[1][1:]
+
+request_test = ""\
+"GET /img/logo-getit.png HTTP/1.1 \n"\
+"Host: 0.0.0.0:8080 \n"\
+"Connection: keep-alive \n"\
+"Accept: image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5 \n"\
+"User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Safari/605.1.15 \n"\
+"Accept-Language: en-us \n"\
+"Referer: http://0.0.0.0:8080/ \n"\
+"Accept-Encoding: gzip, deflate"
+
+#print(extract_route(request_test))
+
+def read_file(filepath):
+    if filepath.suffix in ['.txt', '.html', '.css', '.js']:
+        mode = 'r'
     else:
-        lista1 = requisicao.split("POST /")
+        mode = 'rb'
 
-    lista2 = lista1[1].split(" ")
-    return lista2[0]
+    with open(filepath, mode=mode) as f:
+        return f.read()
 
-def read_file(path):
-    lista = str(path).split(".")
-    if lista[-1]=="txt" or lista[-1]=="html" or lista[-1]=="css" or lista[-1]=="js":
-        with open(path, "rb") as file:
-            text = file.read()
-            return text
-    else:
-        with open(path, "rb") as file:
-            binary = file.read()
-        return binary
+#print(read_file(Path("img/logo-getit.png")))
 
-def load_data(nomeJson):
-    filePath = "data/"+nomeJson
-    with open(filePath, "rt", encoding="utf-8") as text:
-        content = text.read()
-        contentPython = json.loads(content)
-        return contentPython
+def load_data(path):
+    with open ("data/{}".format(path), "r") as arquivo:
+        conteudo = arquivo.read()
+    return json.loads(conteudo)
 
-def load_template(file_path):
-    file = open("templates/"+file_path, encoding="utf-8")
-    content = file.read()
-    file.close()
-    return content
+#print(load_data(Path("notes.json")))
 
-def recebe_post(params):
-    filename = 'data/notes.json'
-    entry ={
-    "titulo": params['titulo'],
-    "detalhes": params['detalhes']
-  }
-    with open(filename, "rt", encoding="utf-8") as file:
-        data = json.load(file)
-    data.append(entry)
-    with open(filename, "w", encoding="utf-8") as file:
-        json.dump(data, file)
-        
+def load_template(path):
+    with open ("templates/{}".format(path), "r") as arquivo:
+        conteudo = arquivo.read()
+    return conteudo
+
 
 def build_response(body='', code=200, reason='OK', headers=''):
-    #STR DO CODE
-    c = ("{}".format(code))
-
-    if body != "":
-        stri = 'HTTP/1.1 200 OK\n\n' + body
-    elif code != 200:
-        if headers != '':
-            stri = "HTTP/1.1" + " " + c + " " +reason + "\n"+ headers + "\n\n"
-        else:
-            stri = "HTTP/1.1" + " " + c + " " +reason + "\n\n"
-    else:
-        stri = 'HTTP/1.1 200 OK\n\n'
-    return stri.encode()
+    #'HTTP/1.1 200 OK\n\n'.encode() + response)
+    if headers:
+        headers=f"\n{headers}"
+    response = f"HTTP/1.1 {code} {reason}{headers}\n\n{body}".encode()
+    return response
+# print(build_response())
