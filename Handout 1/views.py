@@ -23,7 +23,6 @@ def index(request):
                 params["detalhes"] = urllib.parse.unquote_plus(chave_valor[chave_valor.find("=")+1:], encoding="utf-8", errors="replace")
         
         recebe_post(params)
-        return build_response(code="303", reason='See Other',headers='Location: /')
         
     note_template = load_template('components/note.html')
     notes_li = [
@@ -31,5 +30,5 @@ def index(request):
         for dados in load_data('notes.json')
     ]
     notes = '\n'.join(notes_li)
-    a=load_template('index.html').format(notes=notes).encode()
-    return a+build_response()
+    corpo=load_template('index.html').format(notes=notes)
+    return build_response()+corpo.encode()

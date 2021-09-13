@@ -26,7 +26,7 @@ def target_function(function_name):
     return decorate
 
 
-'''@target_function('extract_route')
+@target_function('extract_route')
 class ExtractRouteTestCase(unittest.TestCase):
     def test_extract_root_from_request(self):
         request = REQUEST_TEMPLATE.format(method='GET', route='/')
@@ -117,7 +117,7 @@ class LoadTemplateTestCase(unittest.TestCase):
         expected = '<p>{text}</p>'
         self.assert_template_loaded('components/component.html', expected)
 
-'''
+
 @target_function('build_response')
 class BuildResponseTestCase(unittest.TestCase):
     def test_build_empty_response(self):
